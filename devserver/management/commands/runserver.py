@@ -94,9 +94,9 @@ class Command(BaseCommand):
         # `requires_system_checks`. If both options are present, an error is
         # raised. BaseCommand sets requires_system_checks in >= Django 1.7.
         if hasattr(self, 'requires_system_checks'):
-            requires_system_checks = False
+            self.requires_system_checks = False
         else:
-            requires_model_validation = False  # Django < 1.7
+            self.requires_model_validation = False  # Django < 1.7
         super(Command, self).__init__()
 
     def add_arguments(self, parser):
@@ -118,7 +118,7 @@ class Command(BaseCommand):
             args = cmd_options.pop('args', ())
         else:
             options, args = parser.parse_args(argv[2:], options)
-            cmd_options = var(options)
+            cmd_options = vars(options)
 
         handle_default_options(options)
         self.execute(*args, **options.__dict__)
