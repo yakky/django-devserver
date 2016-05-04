@@ -53,7 +53,7 @@ def patch_get_commands():
     # Make autoreload use the devserver's runserver command instead of the
     # default one. This prevent crashing the devserver on a syntax error
     import functools
-    import django.core.management.get_commands
+    import django.core.management
 
     original = django.core.management.get_commands
     if getattr(original, '_wrapped', False):
