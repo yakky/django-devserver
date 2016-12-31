@@ -78,7 +78,7 @@ if any(map(lambda app: app in settings.INSTALLED_APPS, STATICFILES_APPS)):
     })
 
 class Command(BaseCommand):
-    if BaseCommand.option_list:
+    if hasattr(BaseCommand, 'option_list'):
         # Handle Django < 1.8
         option_list = BaseCommand.option_list + (
             make_option(name, **kwargs)
@@ -117,8 +117,9 @@ class Command(BaseCommand):
             cmd_options = vars(options)
             args = cmd_options.pop('args', ())
         else:
-            options, args = parser.parse_args(argv[2:], options)
+            options = parser.parse_args(argv[2:], options)
             cmd_options = vars(options)
+            args = [options.addrport]
 
         handle_default_options(options)
         self.execute(*args, **options.__dict__)
@@ -188,7 +189,10 @@ class Command(BaseCommand):
                 debug.technical_500_response = null_technical_500_response
 
         self.stdout.write("Validating models...\n\n")
-        self.validate(display_num_errors=True)
+        self.check(display_num_errors=True)
+        # Need to check migrations here, so can't use the
+        # requires_migrations_check attribute.
+        self.check_migrations()
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
             "Running django-devserver %(devserver_version)s\n"
